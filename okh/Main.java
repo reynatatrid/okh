@@ -130,7 +130,9 @@ public class Main {
 				System.exit(0);
         }
         
-        final long startTime0 = System.nanoTime();
+        final long startTime = System.nanoTime();
+		
+		/* initial solution
 		final CourseSet cs = new CourseSet(dir_crs);
 		final ConflictMatrix cm = new ConflictMatrix(dir_stu, cs.getSize());
 		final int[][] confMat = cm.getConflictMatrix();
@@ -139,9 +141,13 @@ public class Main {
 		final Solution bestSolution = new Solution(solution);
 		System.out.println("Jumlah Timeslot : " + bestSolution.getJumlahTimeslot());
 		System.out.println("Penalty : " + Utils.getPenalty(confMat, solution, jumlahSiswa));
-		final long endTime0   = System.nanoTime();
-		final long totalTime0 = endTime0 - startTime0;
-		System.out.println("Time (s)  : " + (double)totalTime0/1000000000);
+		*/
+		
+		Optimizer.hillClimbing(dir_stu, dir_crs, 100, 1000000);
+
+		final long endTime   = System.nanoTime();
+		final long totalTime = endTime - startTime;
+		System.out.println("Time (s)  : " + (double)totalTime/1000000000);
 
     }
 }
