@@ -105,12 +105,17 @@ public class Optimizer {
 		CourseSet cs = new CourseSet(dir_crs);
 		ConflictMatrix cm = new ConflictMatrix(dir_stu, cs.getSize());
 		
+		int jumlahStudent = cm.getJumlahStudent();
+		double bestPenalty;
+
 		//init sol = timeslotTabuSeacrh
 		int [][] conflict_matrix = cm.getConflictMatrix();
 		int[][] jadwal = Scheduler.getSaturationSchedule(cs.getSize(), cm.getDegree(), conflict_matrix);
 		double penalty = Utils.getPenalty(conflict_matrix, jadwal, jumlahStudent);
 		
 		//Utils.copySolution = Evaluator.getTimeslot
+		int[][] bestTimeslot = Utils.copySolution(jadwal); // handle current best timeslot
+    	int[][] bestcandidate  = Utils.copySolution(jadwal);
 		int [][] timeslotTabuSearchSementara = Utils.copySolution(jadwal);
 
 		//inisiasi tabulist
@@ -133,7 +138,7 @@ public class Optimizer {
 			iteration++;
 			ArrayList<int[][]> sneighborhood = new ArrayList<>();
 
-			LowLevelHeuristics lowLevelHeuristics = new LowLevelHeuristics(conflict_matrix);
+			Utils lowLevelHeuristics = new Utils(conflict_matrix);
         	timeslotTabuSearchSementara = lowLevelHeuristics.move(timeslotTabuSearchSementara,1);
         	sneighborhood.add(timeslotTabuSearchSementara);
         	timeslotTabuSearchSementara = lowLevelHeuristics.swap(timeslotTabuSearchSementara,2);
@@ -151,7 +156,7 @@ public class Optimizer {
 	 //        	   penalty2 = Evaluator.getPenalty(conflict_matrix, sneighborhood.get(j), jumlahmurid);
 	 //               penalty1 = Evaluator.getPenalty(conflict_matrix, bestcandidate, jumlahmurid);
 				if( !(tabulist.contains(sneighborhood.get(j))) && 
-						Evaluator.getPenalty(conflict_matrix, sneighborhood.get(j), jumlahmurid) < Evaluator.getPenalty(conflict_matrix, bestcandidate, jumlahmurid))
+						Utils.getPenalty(conflict_matrix, sneighborhood.get(j), jumlahStudent) < Utils.getPenalty(conflict_matrix, bestcandidate, jumlahStudent))
 				  bestcandidate = sneighborhood.get(j);
 					 
 				j++;
@@ -159,8 +164,22 @@ public class Optimizer {
 
 			sneighborhood.clear();
 
-			
+			//bandingkan best neighbor dengan best best solution
+			if(Utils.getPenalty(conflict_matrix, bestcandidate, jumlahStudent) < Utils.getPenalty(conflict_matrix, jadwal, jumlahStudent))
+			jadwal = Utils.copySolution(bestcandidate);
+
+			//masukkan best neighbor tadi ke tabu
+			tabulist.addLast(bestcandidate);
+			if(tabulist.size() > maxtabusize)
+			   tabulist.removeFirst();
+
+			if (iteration == maxiteration) 
+			   terminate = true;
 		}
+		bestPenalty = Utils.getPenalty(conflict_matrix, jadwal, jumlahStudent);
+		System.out.println("Penalty Terbaik : " + bestPenalty); // print best penalty
+
+		
 		/*int jumlahStudent = cm.getJumlahStudent();
 		
 		int[][] jadwalTemp = new int[jadwal.length][2];

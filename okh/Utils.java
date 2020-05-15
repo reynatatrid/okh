@@ -2,6 +2,12 @@ import java.util.Arrays;
 //import java.util.Random;
 
 public class Utils {
+	
+	static int[][] conflict_matrix;
+	Utils(int[][] conflictmatrix) {
+		conflict_matrix = conflictmatrix;
+    }
+	
 	public static int[][] copyArray(int[][] arr) {
 		int[][] arrcop = new int[arr.length][arr.length];
 		
@@ -58,7 +64,7 @@ public class Utils {
 		return (int)(Math.random() * ((max - min) + 1)) + min;
 	}
 	
-	public static int[][] move(int[][] solution, int step) {
+	public int[][] move(int[][] solution, int step) {
 		int[][] temp = solution;
 		int[] timeslot = new int[temp.length];
 		
@@ -76,7 +82,7 @@ public class Utils {
 		return temp;
 	}
 	
-	public static int[][] swap(int[][] solution, int numSwap) {
+	public int[][] swap(int[][] solution, int numSwap) {
 		int[][] temp = solution;
 		
 		for(int i=0; i < numSwap; i++) {
