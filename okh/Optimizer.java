@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.LinkedList;
+
 //import okh.Utils;
 
 public class Optimizer {
@@ -96,5 +99,81 @@ public class Optimizer {
 		
 		setJadwal(jadwal);
 		System.out.println(bestSolution.getPenalty());
+	}
+
+	public static void TabuSearch(String dir_stu, String dir_crs) {
+		CourseSet cs = new CourseSet(dir_crs);
+		ConflictMatrix cm = new ConflictMatrix(dir_stu, cs.getSize());
+		
+		//init sol = timeslotTabuSeacrh
+		int [][] conflict_matrix = cm.getConflictMatrix();
+		int[][] jadwal = Scheduler.getSaturationSchedule(cs.getSize(), cm.getDegree(), conflict_matrix);
+		double penalty = Utils.getPenalty(conflict_matrix, jadwal, jumlahStudent);
+		
+		//Utils.copySolution = Evaluator.getTimeslot
+		int [][] timeslotTabuSearchSementara = Utils.copySolution(jadwal);
+
+		//inisiasi tabulist
+		LinkedList<int[][]> tabulist = new LinkedList<int[][]>();
+		int maxtabusize = 10;
+		tabulist.addLast(Utils.copySolution(jadwal));		
+
+		//inisiasi iterasi
+		int maxiteration = 1000;
+		int iteration=0;
+
+		//inisasi itung penalty
+		double penalty1 = 0;
+		double penalty2 = 0;
+		double penalty3 = 0;
+		
+		boolean terminate = false;
+		
+		while(!terminate){
+			iteration++;
+			ArrayList<int[][]> sneighborhood = new ArrayList<>();
+
+			LowLevelHeuristics lowLevelHeuristics = new LowLevelHeuristics(conflict_matrix);
+        	timeslotTabuSearchSementara = lowLevelHeuristics.move(timeslotTabuSearchSementara,1);
+        	sneighborhood.add(timeslotTabuSearchSementara);
+        	timeslotTabuSearchSementara = lowLevelHeuristics.swap(timeslotTabuSearchSementara,2);
+        	sneighborhood.add(timeslotTabuSearchSementara);
+        	timeslotTabuSearchSementara = lowLevelHeuristics.move(timeslotTabuSearchSementara,2);
+        	sneighborhood.add(timeslotTabuSearchSementara);
+        	timeslotTabuSearchSementara = lowLevelHeuristics.swap(timeslotTabuSearchSementara,3);
+        	sneighborhood.add(timeslotTabuSearchSementara);
+        	timeslotTabuSearchSementara = lowLevelHeuristics.move(timeslotTabuSearchSementara,3);
+			sneighborhood.add(timeslotTabuSearchSementara);
+			
+			//membandingkan neighbor, pilih best neighbor, membandingkan juga apa ada di tabu list
+			int j = 0;
+			while (sneighborhood.size() > j) {
+	 //        	   penalty2 = Evaluator.getPenalty(conflict_matrix, sneighborhood.get(j), jumlahmurid);
+	 //               penalty1 = Evaluator.getPenalty(conflict_matrix, bestcandidate, jumlahmurid);
+				if( !(tabulist.contains(sneighborhood.get(j))) && 
+						Evaluator.getPenalty(conflict_matrix, sneighborhood.get(j), jumlahmurid) < Evaluator.getPenalty(conflict_matrix, bestcandidate, jumlahmurid))
+				  bestcandidate = sneighborhood.get(j);
+					 
+				j++;
+			}
+
+			sneighborhood.clear();
+
+			
+		}
+		/*int jumlahStudent = cm.getJumlahStudent();
+		
+		int[][] jadwalTemp = new int[jadwal.length][2];
+		
+		for(int i = 0; i < jadwalTemp.length; i++) {
+			jadwalTemp[i][0] = jadwal[i][0];
+			jadwalTemp[i][1] = jadwal[i][1];
+		}
+		//init penalty, ga dipake
+		double penalty = Utils.getPenalty(conflict_matrix, jadwal, jumlahStudent);
+
+		Solution bestSolution = new Solution(jadwal);
+		int max_timeslot = bestSolution.getJumlahTimeslot();
+		*/
 	}	
 }

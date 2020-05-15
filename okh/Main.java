@@ -143,8 +143,8 @@ public class Main {
 		System.out.println("Penalty : " + Utils.getPenalty(confMat, solution, jumlahSiswa));
 		*/
 		
-		Optimizer.hillClimbing(dir_stu, dir_crs, 100, 1000000);
-
+		Optimizer.hillClimbing(dir_stu, dir_crs, 100, 10000);
+		Optimizer.TabuSearch(dir_stu, dir_crs);
 		final long endTime   = System.nanoTime();
 		final long totalTime = endTime - startTime;
 		System.out.println("Time (s)  : " + (double)totalTime/1000000000);
