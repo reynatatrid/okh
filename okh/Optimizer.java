@@ -179,7 +179,7 @@ public class Optimizer {
 		bestPenalty = Utils.getPenalty(conflict_matrix, jadwal, jumlahStudent);
 		System.out.println("Penalty Terbaik : " + bestPenalty); // print best penalty
 
-		
+
 		/*int jumlahStudent = cm.getJumlahStudent();
 		
 		int[][] jadwalTemp = new int[jadwal.length][2];
